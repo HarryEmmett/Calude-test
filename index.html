@@ -1,1 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hello World</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex; align-items: center; justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: sans-serif;
+    }
+    h1 {
+      color: white; font-size: 3rem; text-align: center; padding: 0 1rem;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    h1.hidden { opacity: 0; transform: translateY(20px); }
+  </style>
+</head>
+<body>
+  <h1 id="msg">Hello, World! 👋</h1>
+  <script>
+    const messages = [
+      "Hello, World! 👋", "Bonjour, Monde! 🇫🇷", "Hola, Mundo! 🇪🇸",
+      "Ciao, Mondo! 🇮🇹", "Hallo, Welt! 🇩🇪", "こんにちは、世界！ 🇯🇵",
+      "你好，世界！ 🇨🇳", "مرحبا بالعالم! 🌍"
+    ];
+    let i = 0;
+    const el = document.getElementById("msg");
+    setInterval(() => {
+      el.classList.add("hidden");
+      setTimeout(() => {
+        i = (i + 1) % messages.length;
+        el.textContent = messages[i];
+        el.classList.remove("hidden");
+      }, 500);
+    }, 2500);
+  </script>
+</body>
+</html>
 
