@@ -3,41 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello Friend</title>
+  <title>Todo List</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      display: flex; align-items: center; justify-content: center;
-      height: 100vh;
+      display: flex; align-items: flex-start; justify-content: center;
+      min-height: 100vh; padding: 4rem 1rem;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       font-family: sans-serif;
     }
-    h1 {
-      color: white; font-size: 3rem; text-align: center; padding: 0 1rem;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+    .app {
+      width: 100%; max-width: 420px;
+      background: white; border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
-    h1.hidden { opacity: 0; transform: translateY(20px); }
+    h1 { font-size: 1.5rem; margin-bottom: 1rem; color: #333; }
+    form { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    input[type="text"] {
+      flex: 1; padding: 0.6rem 0.75rem;
+      border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;
+    }
+    button {
+      padding: 0.6rem 1rem; border: none; border-radius: 8px;
+      background: #667eea; color: white; font-size: 1rem; cursor: pointer;
+    }
+    button:hover { background: #5a6fd6; }
+    ul { list-style: none; }
+    li {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 0; border-bottom: 1px solid #eee;
+    }
+    li span { flex: 1; color: #333; }
+    li.done span { text-decoration: line-through; color: #999; }
+    li .delete {
+      background: none; color: #c0392b; padding: 0.2rem 0.5rem; font-size: 1.1rem;
+    }
+    li .delete:hover { background: #fdecea; }
+    .empty { color: #999; text-align: center; padding: 1rem 0; }
   </style>
 </head>
 <body>
-  <h1 id="msg">Hello, World! 👋</h1>
+  <div class="app">
+    <h1>📝 Todo List</h1>
+    <form id="form">
+      <input type="text" id="input" placeholder="What needs doing?" autocomplete="off" />
+      <button type="submit">Add</button>
+    </form>
+    <ul id="list"></ul>
+    <p class="empty" id="empty">No todos yet — add one above.</p>
+  </div>
   <script>
-    const messages = [
-      "Hello, World! 👋", "Bonjour, Monde! 🇫🇷", "Hola, Mundo! 🇪🇸",
-      "Ciao, Mondo! 🇮🇹", "Hallo, Welt! 🇩🇪", "こんにちは、世界！ 🇯🇵",
-      "你好，世界！ 🇨🇳", "مرحبا بالعالم! 🌍"
-    ];
-    let i = 0;
-    const el = document.getElementById("msg");
-    setInterval(() => {
-      el.classList.add("hidden");
-      setTimeout(() => {
-        i = (i + 1) % messages.length;
-        el.textContent = messages[i];
-        el.classList.remove("hidden");
-      }, 500);
-    }, 2500);
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+    const list = document.getElementById("list");
+    const empty = document.getElementById("empty");
+    let todos = JSON.parse(localStorage.getItem("todos") || "[]");
+
+    function save() {
+      localStorage.setItem("todos", JSON.stringify(todos));
+    }
+
+    function render() {
+      list.innerHTML = "";
+      empty.style.display = todos.length ? "none" : "block";
+      todos.forEach((todo, i) => {
+        const li = document.createElement("li");
+        if (todo.done) li.classList.add("done");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = todo.done;
+        checkbox.addEventListener("change", () => {
+          todos[i].done = checkbox.checked;
+          save(); render();
+        });
+
+        const span = document.createElement("span");
+        span.textContent = todo.text;
+
+        const del = document.createElement("button");
+        del.className = "delete";
+        del.textContent = "✕";
+        del.addEventListener("click", () => {
+          todos.splice(i, 1);
+          save(); render();
+        });
+
+        li.append(checkbox, span, del);
+        list.appendChild(li);
+      });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      todos.push({ text, done: false });
+      input.value = "";
+      save(); render();
+    });
+
+    render();
   </script>
 </body>
 </html>
-
